@@ -1,0 +1,40 @@
+@media(max-width: 700px){
+    .fact>span{
+        margin-left: 4px;
+    }
+    .mobine{
+        display: none;
+    }
+.mobinet{
+    text-align: center;
+}
+.rating>span {
+    margin-right: 20px;
+}
+.rating{
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    align-items: center;
+}
+
+.videotr {
+     margin: 0px;
+ 
+   height: auto;
+   
+
+}
+
+
+.nav-link:focus, .nav-link {
+
+
+    padding: 4px;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 2rem;
+  
+  } 
+
+}

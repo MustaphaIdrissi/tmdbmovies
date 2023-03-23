@@ -2,45 +2,32 @@ var keyapid = '154dc2583c4b4c5100af5ea57b3694b7';
 var baselink = 'https://api.themoviedb.org/3';
 var baseimgmin = 'https://www.themoviedb.org/t/p/w600_and_h900_bestv2';
 var baseimgmax = 'https://image.tmdb.org/t/p/w1920_and_h800_multi_faces';
-const datgen=new Array();
+var datgen = new Array();
+var film = "";
+var datgent = [];
+var datdah = [];
+const region = window.navigator.language;
 
-const region=window.navigator.language;
-
-
-
-function serarchgeners(typegen){
-
- 
-
-  let urlfd = baselink + "/discover/movie?api_key=" + keyapid +"&language=en-US&with_watch_monetization_types="+typegen;
-
-  fetch(urlfd)
-      .then((response) => response.json())
-      .then((datdah) => {
+function datamo() {
 
 
-       
-   
-var dt=JSON.stringify(datdah.results);
-     
-        sessionStorage.setItem('serchg',dt );
 
-      
-window.location.href="serarch.html";
-   
-      })
+}
+function serarchgeners(typegen) {
 
-  
- 
+  sessionStorage.setItem("idser", typegen);
+  window.location.href = "serarch.html";
 
-}   
+
+
+}
 
 function infofilm(idfil) {
 
 
-    sessionStorage.setItem('idfilm', idfil);
+  sessionStorage.setItem('idfilm', idfil);
 
-    window.location.href = 'film.html';
+  window.location.href = 'film.html';
 
 
 
@@ -48,42 +35,54 @@ function infofilm(idfil) {
 
 
 function percentageRating(rating) {
-    return Math.ceil(rating *10);
-  }
+
+
+  return Math.ceil(rating * 10);
+}
+
+
+
 function timeConvert(runtime) {
-    var hours = Math.floor(runtime / 60);
-    var minutes = runtime % 60;
-    return hours + "h" + minutes+ "m";
-  }
+  var hours = Math.floor(runtime / 60);
+  var minutes = runtime % 60;
+  return hours + "h" + minutes + "m";
+}
+
+
+
+
 function infofilmd() {
 
 
-    var idf = sessionStorage.getItem("idfilm");
+  var idf = sessionStorage.getItem("idfilm");
 
 
 
 
-    let urlf = baselink + "/movie/" + idf + "?api_key=" + keyapid + "&language=en-US";
-    fetch(urlf)
-        .then((response) => response.json())
-        .then((data) => {
+  let urlf = baselink + "/movie/" + idf + "?api_key=" + keyapid + "&language=en-US";
+  fetch(urlf)
+    .then((response) => response.json())
+    .then((data) => {
 
-        
-            let ffd = "";
-            let gens = "";
-            for (gene of data['genres']) {
-                gens += `<a href="#">${gene['name']}</a>`
-            }
-            
-            document.getElementById("lfilm").innerHTML = " ";
-            ffd += `  
+
+      let ffd = "";
+      let gens = "";
+
+
+
+      for (gene of data['genres']) {
+        gens += `<a href="#">${gene['name']}</a>`
+      }
+
+      document.getElementById("lfilm").innerHTML = "";
+      ffd += `  
             <div class="card text-bg-dark p-0 m-0" style="    height: 450px;">
               <div class="bgcover"> </div>
               <img src="${baseimgmax + data['poster_path']}"
                 class="card-img h-100 " alt="${data['original_title']}">
               <div class="card-img-overlay info ">
                 <div class="row p-1">
-                  <div class="col-3">
+                  <div class="col-md-3 mobine">
                     <div class="poster">
     
                       <img src="${baseimgmin + data['poster_path']}" class="imposter h-100"
@@ -98,7 +97,7 @@ function infofilmd() {
                     </div>
     
                   </div>
-                  <div class="col-8 text-align-left lh-lg">
+                  <div class="col-md-8 col-sm-12  mobinet text-align-left lh-lg">
                     <h2 class="card-title text-capitalize">${data['original_title']}</h2>
                     <div class="fact">
                       <span class="certification"><small>${data['original_language']}</small></span>
@@ -112,12 +111,16 @@ function infofilmd() {
                       
                       </small></span>
                     </div>
-                    <div>
+                    <div class="rating">
                       <span>User Score</span>
-                      <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: ${percentageRating(data['vote_average'])}%;" aria-valuenow="${percentageRating(data['vote_average'])}%"
-                          aria-valuemin="0" aria-valuemax="100">${percentageRating(data['vote_average'])}%</div>
-                      </div>
+                
+                              
+   
+                      <div class="circular-progress">
+                      <div class="value-container">0%</div>
+                    </div>
+
+                     
                     </div>
                     <div class="Overview"><span>Overview</span>
                       <p class="card-text">${data['overview']}</p>
@@ -136,35 +139,54 @@ function infofilmd() {
     
     `
 
-            document.getElementById("lfilm").innerHTML += ffd;
-            creditsfilmd();
-        })
 
+      document.getElementById("lfilm").innerHTML += ffd;
+      let progressBar = document.querySelector(".circular-progress");
+      let valueContainer = document.querySelector(".value-container");
 
+      let progressValue = 0;
+      let progressEndValue = parseFloat(percentageRating(data['vote_average']));
+      let speed = 50;
+
+      let progress = setInterval(() => {
+        progressValue++;
+        valueContainer.textContent = `${progressValue}%`;
+        progressBar.style.background = `conic-gradient(
+                  #4d5bf9 ${progressValue * 3.6}deg,
+                  #cadcff ${progressValue * 3.6}deg
+              )`;
+        if (progressValue == progressEndValue) {
+          clearInterval(progress);
+        }
+      }, speed);
+      creditsfilmd();
+    })
+
+  vedoifilm();
 }
 function creditsfilmd() {
 
 
-    var idf = sessionStorage.getItem("idfilm");
+  var idf = sessionStorage.getItem("idfilm");
 
 
 
 
-    let urlac = baselink + "/movie/" + idf + "/credits?api_key=" + keyapid + "&language=en-US";
-    fetch(urlac)
-        .then((response) => response.json())
-        .then((datac) => {
+  let urlac = baselink + "/movie/" + idf + "/credits?api_key=" + keyapid + "&language=en-US&Limit=10";
+  fetch(urlac)
+    .then((response) => response.json())
+    .then((datac) => {
 
-            
-        let actfilm="";
-            let i=0;
-            document.getElementById("actfilm").innerHTML = " ";
-            for (act of datac.cast) {
-                if(i<29 && act['profile_path'] != null){
-                  i=i+1;
-                  actfilm += `  
+
+      let actfilm = "";
+      let i = 0;
+      document.getElementById("actfilm").innerHTML = " ";
+      for (act of datac.cast) {
+        if (i < 29 && act['profile_path'] != null) {
+          i = i + 1;
+          actfilm += `  
                   <div class="col-1 text-center card me-3 mt-1 p-0">
-                  <img class=" w-100" src="${baseimgmin +act['profile_path']}"
+                  <img class=" w-100" src="${baseimgmin + act['profile_path']}"
                     alt="${act['original_name']}">
                   <div>
                     <h6>${act['original_name']}</h6>
@@ -173,23 +195,52 @@ function creditsfilmd() {
           
           
           `
-                }}
+        }
+      }
 
-            document.getElementById("actfilm").innerHTML += actfilm;
-        })
+      document.getElementById("actfilm").innerHTML += actfilm;
+    })
+
+
+}
+
+function vedoifilm() {
+  var idf = sessionStorage.getItem("idfilm");
+  const urlv = baselink + "/movie/" + idf + "/videos?api_key=" + keyapid + "&language=en-US";
+
+  document.getElementById("vedio").innerHTML += "";
+  let i = 0;
+  let ved = "";
+  fetch(urlv)
+    .then((response) => response.json())
+    .then((datacv) => {
+
+
+
+
+
+      for (vre of datacv.results) {
+        if (i < 1) {
+          i++;
+          ved += `<iframe class="videotr" src="https://www.youtube.com/embed/${vre['key']}" title="" frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+`}
+
+      }
+
+      document.getElementById("vedio").innerHTML += ved;
+    })
 
 
 }
 
 
 
-
-
 function indextop() {
-    let urlf = baselink + "/movie/popular?api_key=" + keyapid + "&language=en-US";
-    fetch(urlf)
-        .then((response) => response.json())
-        .then((responser) => {
+  let urlf = baselink + "/movie/popular?api_key=" + keyapid + "&language=en-US";
+  fetch(urlf)
+    .then((response) => response.json())
+    .then((responser) => {
 
 
 
@@ -198,72 +249,143 @@ function indextop() {
 
 
 
-     
-
-            let film = "";
-
-            document.getElementById("lafiche").innerHTML = " ";
-
-            for (dt1 of responser.results) {
-
-           
-
-              const cars = [];
-              cars['id']= dt1['id'];
-              cars['poster']= dt1['poster_path'];
-              cars['titre']= dt1['original_title'];
-              cars['genr']=dt1['genres'];
 
 
-              datgen.push(cars);
-             
-            
-                film += `
-            <div class="card  col-md-2 col-sm-4   m-2 p-0" style="border-radius: 22px;overflow: hidden;">
+      var cars = [];
+      document.getElementById("lafiche").innerHTML = " ";
+
+      for (dt1 of responser.results) {
+
+
+
+
+        cars['id'] = dt1['id'];
+        cars['poster'] = dt1['poster_path'];
+        cars['titre'] = dt1['original_title'];
+        cars['genr'] = dt1['genre_ids'];
+
+
+        datgen.push(dt1);
+        //  console.log(datgen);
+        var yu = JSON.stringify(dt1);
+        sessionStorage.setItem('topfil', yu);
+
+        film += `
+            <div class="card   col-md-2 col-sm-2   m-2 p-0" style="border-radius: 22px;overflow: hidden;">
             <a onclick="infofilm('${dt1['id']}')" >
-            <div class="hoverimg">
+            <div class="hoverimg ">
+            <div class="  titrpos p-0">
+            <h6>${dt1['original_title']}</h6>
+            </div>
+           
             </div></a>
             <img class="card-body p-0" src="${baseimgmin + dt1['poster_path']}" alt="${dt1['original_title']}"/>
             
-            <div class="card-footer p-0">
-            <h6>${dt1['original_title']}</h6>
-            </div>
+       
             </div>`
 
 
 
 
 
-            };
+      };
 
-            document.getElementById("lafiche").innerHTML += film;
+      document.getElementById("lafiche").innerHTML += film;
 
-        }
-        )
+    }
+    )
 
 }
 
 listgeners();
-function listgeners(){
+function listgeners() {
 
 
-let urlg=  baselink + "/genre/movie/list?api_key=" + keyapid + "&language=en-US";
-fetch(urlg)
-.then((response) => response.json())
-.then((responset) => {
+  let urlg = baselink + "/genre/movie/list?api_key=" + keyapid + "&language=en-US";
+  fetch(urlg)
+    .then((response) => response.json())
+    .then((responset) => {
 
-  let gene = "";
- 
-       document.getElementById("listAZ").innerHTML = " ";
-        for (dtg of responset.genres) {
+      let gene = "";
 
-          
-            gene += `
-                    <li class='list-group-item bg-dark'><a class="list-group-item list-group-item-action" onclick="serarchgeners('${dtg["name"]}')" >${dtg["name"]}</a></li>`
-        };
+      document.getElementById("listAZ").innerHTML = " ";
+      for (dtg of responset.genres) {
 
-document.getElementById("listAZ").innerHTML += gene ;
+
+        gene += `
+            <span class="item1 col-2 text-uppercase fw-bold ">
+            <a class="list-group-item list-group-item-action bg-dark nav-link fs-6"  onclick="serarchgeners('${dtg["id"]}')">
+            ${dtg["name"]}</a>
+            </span>
+                 `
+      };
+
+      document.getElementById("listAZ").innerHTML += gene;
+
+    }
+    )
+
 }
-)
+function serinfo() {
+
+
+  let film = '';
+  document.getElementById("lafichee").innerHTML = " ";
+  let idfsg = JSON.parse(sessionStorage.getItem("idser"));
+
+
+
+
+
+  let urlf = baselink + "/movie/popular?api_key=" + keyapid + "&language=en-US";
+  fetch(urlf)
+    .then((response) => response.json())
+    .then((responserr) => {
+
+
+
+
+        responserr.results.forEach(eldfs => {
+
+
+          for (let i = 0; i < eldfs['genre_ids'].length; i++) {
+            if (eldfs['genre_ids'][i] == idfsg) {
+              film += `
+                <div class="card  col-md-2 col-sm-4   m-2 p-0" style="border-radius: 22px;overflow: hidden;">
+                   <a onclick="infofilm('${eldfs['id']}')" >
+                   <div class="hoverimg">
+                  </div></a>
+                  <img class="card-body p-0" src="${baseimgmin + eldfs['poster_path']}" alt="${eldfs['original_title']}"/>
+                  
+                  <div class="card-footer p-0">
+                  <h6>${eldfs['original_title']}</h6>
+                  </div>
+                  </div>`
+
+            }
+          }
+
+
+
+
+        });
+
+      
+if( film!=""){
+        document.getElementById("lafichee").innerHTML = film;
+      }else{
+
+        document.getElementById("lafichee").innerHTML = "ne pas";
+      }
+    });
+
+
+
+
 
 }
+
+
+
+
+
